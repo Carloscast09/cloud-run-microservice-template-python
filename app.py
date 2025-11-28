@@ -1,35 +1,27 @@
 import streamlit as st
-import signal
-import sys
-from utils.logging import logger, flush
 
-# Configuración de la página
-st.set_page_config(page_title="Clase de Cómputo en la Nube")
+st.set_page_config(
+    page_title="Dashboard en la Nube – Cloud Run",
+    layout="wide"
+)
 
-def shutdown_handler(signal_int, frame):
-    logger.info(f"Caught Signal {signal.strsignal(signal_int)}")
-    flush()
-    sys.exit(0)
+st.title("Dashboard – Analítica Descriptiva en la Nube (Cloud Run + GCS)")
 
-# Manejo de señales (útil para Cloud Run)
-signal.signal(signal.SIGINT, shutdown_handler)
-signal.signal(signal.SIGTERM, shutdown_handler)
+st.markdown("""
+Bienvenido al dashboard en la nube desplegado con **Cloud Run**.
 
-def main():
-    # 1. Logs personalizados como tenías antes
-    logger.info(logField="custom-entry", arbitraryField="custom-entry")
-    logger.info("Child logger with trace Id.")
+Este sistema permite:
 
-    # 2. El contenido visual (lo que antes era el return string)
-    st.title("Holaaaaaa, Charly")
-    st.header("desde la clase de Computo en la nube :)")
-    
-    st.write("Esta es una página generada con Streamlit en lugar de texto plano.")
-    
-    # Ejemplo de interactividad (algo que Flask no hace fácil)
-    if st.button('Saludar al log'):
-        logger.info("El usuario hizo clic en el botón")
-        st.success("¡Saludo enviado al log!")
+### Analizar datasets grandes alojados en Google Cloud Storage
+- Cargar archivos CSV desde un bucket.
+- Navegar archivo por archivo.
+- Visualizar histogramas, patrones horarios y matrices de correlación usando **Altair**.
 
-if __name__ == "__main__":
-    main()
+---
+
+Usa el menú lateral para acceder a la sección:
+
+**1_Analitica_Descriptiva_GCS**
+
+---
+""")
