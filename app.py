@@ -1,57 +1,35 @@
-# Copyright 2021 Google LLC
-#
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-#     http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
-
+import streamlit as st
 import signal
 import sys
-from types import FrameType
+from utils.logging import logger, flush
 
-from flask import Flask
+# Configuración de la página
+st.set_page_config(page_title="Clase de Cómputo en la Nube")
 
-from utils.logging import logger
-
-app = Flask(__name__)
-
-
-@app.route("/")
-def hello() -> str:
-    # Use basic logging with custom fields
-    logger.info(logField="custom-entry", arbitraryField="custom-entry")
-
-    # https://cloud.google.com/run/docs/logging#correlate-logs
-    logger.info("Child logger with trace Id.")
-
-    return "Holaaaaaa, Charly desde la clase de Computo en la nube :)"
-
-
-def shutdown_handler(signal_int: int, frame: FrameType) -> None:
+def shutdown_handler(signal_int, frame):
     logger.info(f"Caught Signal {signal.strsignal(signal_int)}")
-
-    from utils.logging import flush
-
     flush()
-
-    # Safely exit program
     sys.exit(0)
 
+# Manejo de señales (útil para Cloud Run)
+signal.signal(signal.SIGINT, shutdown_handler)
+signal.signal(signal.SIGTERM, shutdown_handler)
+
+def main():
+    # 1. Logs personalizados como tenías antes
+    logger.info(logField="custom-entry", arbitraryField="custom-entry")
+    logger.info("Child logger with trace Id.")
+
+    # 2. El contenido visual (lo que antes era el return string)
+    st.title("Holaaaaaa, Charly")
+    st.header("desde la clase de Computo en la nube :)")
+    
+    st.write("Esta es una página generada con Streamlit en lugar de texto plano.")
+    
+    # Ejemplo de interactividad (algo que Flask no hace fácil)
+    if st.button('Saludar al log'):
+        logger.info("El usuario hizo clic en el botón")
+        st.success("¡Saludo enviado al log!")
 
 if __name__ == "__main__":
-    # Running application locally, outside of a Google Cloud Environment
-
-    # handles Ctrl-C termination
-    signal.signal(signal.SIGINT, shutdown_handler)
-
-    app.run(host="localhost", port=8080, debug=True)
-else:
-    # handles Cloud Run container termination
-    signal.signal(signal.SIGTERM, shutdown_handler)
+    main()
